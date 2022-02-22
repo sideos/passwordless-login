@@ -6,17 +6,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
 const cors_1 = __importDefault(require("cors"));
-const app = express_1.default();
+const redis_1 = require("./redis");
+const app = (0, express_1.default)();
 const expressWs = require('express-ws')(app);
 const PORT = 8080;
-app.use(cors_1.default({
+app.use((0, cors_1.default)({
     credentials: true,
     origin: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
 }));
 var components = {
-    ws: null
+    ws: null,
+    redis: null
 };
+components.redis = { setItem: redis_1.setItem, getItem: redis_1.getItem };
 // Health check at "/"
 app.get('/', (req, res) => {
     res.status(200).send('all in check!');

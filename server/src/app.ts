@@ -1,10 +1,16 @@
 import express from 'express';
 import http from 'http'
 import cors from 'cors';
+import {components} from './config'
+import {setItem, getItem} from './redis'
+import { setupRequest, createRequest } from './endpoints/login';
 
 const app = express();
 const expressWs = require('express-ws')(app)
 
+const requestRouter = express.Router()
+setupRequest(requestRouter, components)
+app.use("/request", requestRouter);
 
 const PORT = 8080;
 
@@ -15,9 +21,8 @@ app.use(
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   })
 );
-var components = {
-  ws: null
-}
+
+components.redis = {setItem, getItem}
 
 // Health check at "/"
 app.get('/', (req, res) => {
@@ -28,7 +33,7 @@ const s = http.createServer(app)
 //@ts-ignore
 app.ws('/login', (ws, req) => {
     components.ws = ws
-
+    
     ws.on('close', () => {
         console.log('WebSocket was closed')
     })
