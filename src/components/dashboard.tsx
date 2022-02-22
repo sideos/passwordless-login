@@ -1,10 +1,13 @@
-import React from 'react';
 import { useEffect, useState} from 'react';
-import logo from './logo.svg';
-import './App.css';
-import QRCode from 'qrcode.react'
+import '../App.css';
+import { connect, ConnectedProps} from 'react-redux'
+import type { RootState } from '../store'
 
-function Login() {
+
+type PropsFromRedux = ConnectedProps<typeof connector>
+interface AppProps extends PropsFromRedux { }
+
+function Dashboard(props:AppProps) {
   const [qrcode, setQrcode] = useState('')
   const [error, setError] = useState('');
   useEffect(() => {
@@ -36,17 +39,18 @@ function Login() {
   return (
     <div className="App">
       <header className="App-header">
+        Dashboard
       </header>
-      <section>
-      <QRCode 
-            value={qrcode} 
-            includeMargin={true}
-            size={250}
-            className="qrcode"
-          />
-      </section>
     </div>
   );
 }
 
-export default Login;
+const mapStateToProps = (state:RootState) => {
+  return {
+    token: state.login.token,
+  };
+};
+
+const connector = connect(mapStateToProps)
+
+export default connector(Dashboard);
