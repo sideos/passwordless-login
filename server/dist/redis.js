@@ -10,10 +10,4 @@ const getItem = (key) => {
     return storage[key] || null;
 };
 exports.getItem = getItem;
-// module.exports.setItem = (key, value) => {
-//   storage[key] = value
-// }
-// module.exports.getItem = (key) => {
-//   return storage[key] || null
-// }
 //# sourceMappingURL=redis.js.map
