@@ -2,21 +2,24 @@ import axios, { AxiosResponse } from 'axios'
 import { v4 } from 'uuid'
 import { Router } from 'express-ws';
 
+const PROFILE_INFO = 26
 
-export const createOffer = async (components) => {
+export const createOffer = async (components, email:string) => {
   try {
+    let key = v4()
+    components.redis.setItem(key, key)
     const response = await axios.post(process.env.SSI_SERVER_V2 +"/v2/createoffervc",
         {
-            templateid: [11,12,13],
+            templateid: PROFILE_INFO,
             dataset: {
-                "phone-number": "7836587659743"
+                "email": email
             },
-            domain: process.env.REGISTRATION_HOST +":"+ process.env.REGISTRATION_PORT+"/offer/consume",
-            challenge: "9899"
+            domain: process.env.PASSWORDLESS_LOGIN_SERVER + "/offer/consume",
+            challenge: key
         }, 
         { headers: { 
             'Content-Type': 'application/json',
-            'X-Token': '107ae17b-88c8-42d1-bdea-1460f1936a52' } })
+            'X-Token': process.env.ACCESS_TOKEN} })
     console.log('response', response.data)
     return {data: response.data.data}
 
@@ -29,15 +32,19 @@ export const setupOffer = (router, components) => {
   router.post("/consume/:challenge", async (req, res) => {
     const jwt = req.body.jwt
     let vcs = []
-
-    const response = await axios.post(process.env.SSI_SERVER_V2 + '/v2/consumeoffer', {
-            token: jwt
-            }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Token': '107ae17b-88c8-42d1-bdea-1460f1936a52'
-                }
-            })
-    res.status(200).send(response.data)
+    let verification = components.redis.getItem(req.params.challenge)
+    if (verification) {
+        const response = await axios.post(process.env.SSI_SERVER_V2 + '/v2/consumeoffer', {
+                token: jwt
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Token': process.env.ACCESS_TOKEN
+                    }
+                })
+        res.status(200).json(response.data)
+    } else {
+        res.status(403).json({})
+    }
 })
 }

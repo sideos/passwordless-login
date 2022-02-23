@@ -1,6 +1,7 @@
 import './App.css'
 import Login from './components/login'
 import Dashboard from './components/dashboard'
+import Register from './components/register'
 import { connect, Provider, ConnectedProps} from 'react-redux'
 import { BrowserRouter, Route, Routes} from 'react-router-dom'
 import { FC } from 'react';
@@ -17,6 +18,7 @@ const App:FC<AppProps> = (props:AppProps) => {
         <Route path="/" element={props.token ? <Dashboard /> : <Login />} /> 
         <Route path="/login" element={props.token ? <Dashboard /> : <Login />} /> 
         <Route path="/dashboard" element={props.token ? <Dashboard /> : <Login />} /> 
+        <Route path="/register" element={props.token ? <Register /> : <Login />} /> 
       </Routes>
     </BrowserRouter>
   );

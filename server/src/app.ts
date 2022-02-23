@@ -53,17 +53,19 @@ app.ws('/api/login',async (ws, req) => {
 //@ts-ignore
 app.ws('/api/registration',async (ws, req) => {
     components.ws = ws
-    try {
-      console.log('here')
-      const response = await createOffer(components)
-      ws.send(JSON.stringify(response.data))
-      
-    } catch (e) {
-      ws.send({ err:1, message:e })
-    }
+  
     ws.on('close', () => {
         console.log('WebSocket was closed')
     })
+    ws.on('message', (data) => {
+      console.log(data)
+      let message = JSON.parse(data)
+      if (message.action==="getoffer") {
+        createOffer(components, req.body.email).then(response => {
+          ws.send(JSON.stringify(response.data))
+        }) 
+      }
+  })
 })
 
 app.use(express.json())
