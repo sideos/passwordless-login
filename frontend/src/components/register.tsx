@@ -34,8 +34,6 @@ function Dashboard(props:AppProps) {
   const onMessage = (message: any) => {
     try {
       const parsed = JSON.parse(message.data)
-      console.log(parsed.jwt)
-  
       if (parsed.jwt) {
         setResponse(parsed.jwt)
       }
@@ -45,7 +43,6 @@ function Dashboard(props:AppProps) {
   }
 
   const getOffer = async () => {
-    console.log('click')
     socket.send(JSON.stringify({action: "getoffer", email:email}))
   }
 

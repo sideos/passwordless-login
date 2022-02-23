@@ -44,7 +44,6 @@ const s = http_1.default.createServer(app);
 app.ws('/api/login', (ws, req) => __awaiter(void 0, void 0, void 0, function* () {
     config_1.components.ws = ws;
     try {
-        console.log('here');
         const response = yield (0, login_1.createRequest)(config_1.components);
         ws.send(JSON.stringify(response.data));
     }
@@ -65,7 +64,6 @@ app.ws('/api/registration', (ws, req) => __awaiter(void 0, void 0, void 0, funct
         console.log(data);
         let message = JSON.parse(data);
         if (message.action === "getoffer") {
-            console.log(message.email);
             (0, registration_1.createOffer)(config_1.components, message.email).then(response => {
                 ws.send(JSON.stringify(response.data));
             });

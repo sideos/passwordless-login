@@ -20,7 +20,6 @@ export const createOffer = async (components, email:string) => {
         { headers: { 
             'Content-Type': 'application/json',
             'X-Token': process.env.ACCESS_TOKEN} })
-    console.log('response', response.data)
 
     components.redis.setItem(key, response.data.data.jwt)
     return {data: {error:0, jwt:process.env.PASSWORDLESS_LOGIN_SERVER + "/request/gettoken/" + key}}
@@ -36,7 +35,6 @@ export const setupOffer = (router, components) => {
 
 
   router.post("/consume/:challenge", async (req, res) => {
-    console.log(39, req.body)
     const jwt = req.body.jwt
     let vcs = []
     let verification = components.redis.getItem(req.params.challenge)

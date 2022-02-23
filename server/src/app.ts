@@ -40,7 +40,6 @@ const s = http.createServer(app)
 app.ws('/api/login',async (ws, req) => {
     components.ws = ws
     try {
-      console.log('here')
       const response = await createRequest(components)
       ws.send(JSON.stringify(response.data))
       
@@ -59,10 +58,8 @@ app.ws('/api/registration',async (ws, req) => {
         console.log('WebSocket was closed')
     })
     ws.on('message', (data) => {
-      console.log(data)
       let message = JSON.parse(data)
       if (message.action==="getoffer") {
-        console.log(message.email)
         createOffer(components, message.email).then(response => {
           ws.send(JSON.stringify(response.data))
         }) 

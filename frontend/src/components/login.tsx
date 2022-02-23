@@ -29,15 +29,13 @@ function Login(props:AppProps) {
   const onMessage = (message: any) => {
     try {
       const parsed = JSON.parse(message.data)
-   console.log(message)
       if (parsed.jwt) {
         setQrcode(parsed.jwt)
       }
       if(parsed.email){
-console.log(parsed.email)
+        navigate('/dashboard')
         localStorage.setItem("token",parsed.email)
         props.sendToken(parsed.email)
-        navigate('/dashboard')
       }
     } catch(e) {
 
