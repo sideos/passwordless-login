@@ -4,6 +4,7 @@ import cors from 'cors';
 import { components } from './config'
 import { setItem, getItem } from './redis'
 import { setupRequest, createRequest} from './endpoints/login';
+import { setupOffer, createOffer } from './endpoints/registration';
 
 const app = express();
 const expressWs = require('express-ws')(app)
@@ -11,6 +12,10 @@ const expressWs = require('express-ws')(app)
 const requestRouter = express.Router()
 app.use("/request", requestRouter);
 setupRequest(requestRouter, components)
+
+const offerRouter = express.Router()
+app.use("/offer", offerRouter);
+setupOffer(offerRouter, components)
 
 const PORT = 8084;
 
@@ -39,7 +44,22 @@ app.ws('/api/login',async (ws, req) => {
       ws.send(JSON.stringify(response.data))
       
     } catch (e) {
-      ws.send({err:1, message:e})
+      ws.send({ err:1, message:e })
+    }
+    ws.on('close', () => {
+        console.log('WebSocket was closed')
+    })
+})
+//@ts-ignore
+app.ws('/api/registration',async (ws, req) => {
+    components.ws = ws
+    try {
+      console.log('here')
+      const response = await createOffer(components)
+      ws.send(JSON.stringify(response.data))
+      
+    } catch (e) {
+      ws.send({ err:1, message:e })
     }
     ws.on('close', () => {
         console.log('WebSocket was closed')

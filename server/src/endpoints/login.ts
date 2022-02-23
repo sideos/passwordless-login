@@ -30,7 +30,7 @@ export const createRequest= async (components:{redis}) => {
 export const setupRequest = (router: Router, components: { ws: any; redis: any; }) => {
 
   router.get('/', async(req,res)=> {  
-    console.log('hey')
+
     try {
       const response = await axios.post(process.env.SSI_SERVER_V2 + '/v2/createrequestvc', 
           {
