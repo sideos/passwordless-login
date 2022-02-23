@@ -1,10 +1,10 @@
 import axios, { AxiosResponse } from 'axios'
 import { v4 } from 'uuid'
-import * as express from 'express';
 import { Router } from 'express-ws';
-
+import jwt_decode from "jwt-decode";
 
 const PROFILE_INFO = 26
+
 
 export const createRequest= async (components:{redis}) => {
   try {
@@ -62,6 +62,8 @@ export const setupRequest = (router: Router, components: { ws: any; redis: any; 
   router.post('/consumerequest/:token?', async function (req, res, next) {
     try {
         const jwt = req.body.jwt
+        const decoded:{iss:string} = jwt_decode(jwt)
+        const iss = decoded.iss
         let token = req.params.token
         let ch = components.redis.getItem(token)
         console.log("CH", ch)
@@ -71,14 +73,26 @@ export const setupRequest = (router: Router, components: { ws: any; redis: any; 
             jwt: jwt
         }, {headers: {
             'Content-Type': 'application/json',
-            'X-Token': 'a4918448-82e8-4e52-9e4f-65c5bad03261'
+            'X-Token': process.env.ACCESS_TOKEN
         }})
         response.data.data.payload.verifiableCredential.forEach(element => {
-            console.log("VAL:", element.credentialSubject)
+            console.log("VAL:", element, "JWT:", decoded)
+            // console.log("VAL:", element.credentialSubject)
             vcs.push(element)
         });
-        components.ws.send(JSON.stringify(vcs))
-        res.status(200).json({ data: {error: 0, payload: vcs}})
+
+        if(vcs[0].credentialSubject.id === process.env.DID_ISSUER && vcs[0].credentialSubject.email){
+
+          components.ws.send(JSON.stringify({error:0, email:vcs[0].credentialSubject.email}))
+          res.status(200).json({ data: {error: 0, payload: vcs}})
+          return
+        }else{
+          res.status(403).json({ err:1, message:'forbidden, invalid VC '})
+          return
+        } 
+        
+        //simple jwt parser check if the jwt is valid check type in varifiable credential , email valida?
+
     } catch(e) {
         console.log("ERROR:", e)
     }

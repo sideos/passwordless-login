@@ -8,6 +8,7 @@ import { setupOffer, createOffer } from './endpoints/registration';
 
 const app = express();
 const expressWs = require('express-ws')(app)
+app.use(express.json())
 
 const requestRouter = express.Router()
 app.use("/request", requestRouter);
@@ -61,7 +62,8 @@ app.ws('/api/registration',async (ws, req) => {
       console.log(data)
       let message = JSON.parse(data)
       if (message.action==="getoffer") {
-        createOffer(components, req.body.email).then(response => {
+        console.log(message.email)
+        createOffer(components, message.email).then(response => {
           ws.send(JSON.stringify(response.data))
         }) 
       }

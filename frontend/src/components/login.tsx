@@ -2,8 +2,8 @@ import { useEffect, useState} from 'react';
 import QRCode from 'qrcode.react'
 import '../App.css';
 import { connect, ConnectedProps} from 'react-redux'
-import type { RootState } from '../store'
-
+import type { RootState,AppDispatch } from '../store'
+import { useNavigate } from 'react-router-dom';
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 interface AppProps extends PropsFromRedux { }
@@ -11,7 +11,7 @@ interface AppProps extends PropsFromRedux { }
 function Login(props:AppProps) {
   const [qrcode, setQrcode] = useState('none')
   const [error, setError] = useState('');
-
+  let navigate = useNavigate();
   useEffect(() => {
     const socket = new WebSocket(process.env.REACT_APP_SOCKET_URL+'/api/login/' || "ws://localhost:3200/api/login")
     socket.onmessage = (e) => onMessage(e)
@@ -32,6 +32,12 @@ function Login(props:AppProps) {
    console.log(message)
       if (parsed.jwt) {
         setQrcode(parsed.jwt)
+      }
+      if(parsed.email){
+console.log(parsed.email)
+        localStorage.setItem("token",parsed.email)
+        props.sendToken(parsed.email)
+        navigate('/dashboard')
       }
     } catch(e) {
 
@@ -60,7 +66,12 @@ const mapStateToProps = (state:RootState) => {
     token: state.login.token,
   };
 };
+function mapDispatchToProps(dispatch:AppDispatch) {
+  return {
+    sendToken: (item:string) => { dispatch({type:'STORE_TOKEN', action:item}) },
+  }
+}
 
-const connector = connect(mapStateToProps)
+const connector = connect(mapStateToProps, mapDispatchToProps)
 
 export default connector(Login);

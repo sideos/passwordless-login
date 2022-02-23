@@ -39,7 +39,8 @@ function Dashboard(props:AppProps) {
   return (
     <div className="App">
       <header className="App-header">
-        Dashboard
+        Dashboard 
+        { props.token?<p>hello {props.token}</p>:null }
       </header>
     </div>
   );

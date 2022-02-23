@@ -34,16 +34,19 @@ function Dashboard(props:AppProps) {
   const onMessage = (message: any) => {
     try {
       const parsed = JSON.parse(message.data)
+      console.log(parsed.jwt)
   
-      if (parsed.qrcode) {
+      if (parsed.jwt) {
         setResponse(parsed.jwt)
       }
     } catch(e) {
+      console.log(e)
     }
   }
 
   const getOffer = async () => {
-    socket.send(JSON.stringify({action: "getoffer"}))
+    console.log('click')
+    socket.send(JSON.stringify({action: "getoffer", email:email}))
   }
 
 
@@ -59,7 +62,7 @@ function Dashboard(props:AppProps) {
             {
             response ?
               <QRCode 
-                value={qrcode} 
+                value={response} 
                 includeMargin={true}
                 size={250}
                 className="qrcode"

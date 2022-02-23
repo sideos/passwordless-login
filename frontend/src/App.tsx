@@ -17,8 +17,8 @@ const App:FC<AppProps> = (props:AppProps) => {
       <Routes>
         <Route path="/" element={props.token ? <Dashboard /> : <Login />} /> 
         <Route path="/login" element={props.token ? <Dashboard /> : <Login />} /> 
-        <Route path="/dashboard" element={props.token ? <Dashboard /> : <Login />} /> 
-        <Route path="/register" element={props.token ? <Register /> : <Login />} /> 
+        <Route path="/dashboard" element={<Dashboard/>} />
+        <Route path="/register" element={ <Register /> } /> 
       </Routes>
     </BrowserRouter>
   );

@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.setupRequest = exports.createRequest = void 0;
 const axios_1 = __importDefault(require("axios"));
 const uuid_1 = require("uuid");
+const jwt_decode_1 = __importDefault(require("jwt-decode"));
 const PROFILE_INFO = 26;
 const createRequest = (components) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -39,7 +40,6 @@ const createRequest = (components) => __awaiter(void 0, void 0, void 0, function
 exports.createRequest = createRequest;
 const setupRequest = (router, components) => {
     router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log('hey');
         try {
             const response = yield axios_1.default.post(process.env.SSI_SERVER_V2 + '/v2/createrequestvc', {
                 templateid: PROFILE_INFO,
@@ -68,6 +68,8 @@ const setupRequest = (router, components) => {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const jwt = req.body.jwt;
+                const decoded = (0, jwt_decode_1.default)(jwt);
+                const iss = decoded.iss;
                 let token = req.params.token;
                 let ch = components.redis.getItem(token);
                 console.log("CH", ch);
@@ -77,14 +79,23 @@ const setupRequest = (router, components) => {
                     jwt: jwt
                 }, { headers: {
                         'Content-Type': 'application/json',
-                        'X-Token': 'a4918448-82e8-4e52-9e4f-65c5bad03261'
+                        'X-Token': process.env.ACCESS_TOKEN
                     } });
                 response.data.data.payload.verifiableCredential.forEach(element => {
-                    console.log("VAL:", element.credentialSubject);
+                    console.log("VAL:", element, "JWT:", decoded);
+                    // console.log("VAL:", element.credentialSubject)
                     vcs.push(element);
                 });
-                components.ws.send(JSON.stringify(vcs));
-                res.status(200).json({ data: { error: 0, payload: vcs } });
+                if (vcs[0].credentialSubject.id === process.env.DID_ISSUER && vcs[0].credentialSubject.email) {
+                    components.ws.send(JSON.stringify({ error: 0, email: vcs[0].credentialSubject.email }));
+                    res.status(200).json({ data: { error: 0, payload: vcs } });
+                    return;
+                }
+                else {
+                    res.status(403).json({ err: 1, message: 'forbidden, invalid VC ' });
+                    return;
+                }
+                //simple jwt parser check if the jwt is valid check type in varifiable credential , email valida?
             }
             catch (e) {
                 console.log("ERROR:", e);
