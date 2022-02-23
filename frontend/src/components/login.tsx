@@ -13,7 +13,7 @@ function Login(props:AppProps) {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const socket = new WebSocket(process.env.REACT_APP_SOCKET_URL+'/api/login/'+ process.env.REACT_APP_API_VERSION || "ws://localhost:3200/api/login")
+    const socket = new WebSocket(process.env.REACT_APP_SOCKET_URL+'/api/login/' || "ws://localhost:3200/api/login")
     socket.onmessage = (e) => onMessage(e)
     socket.onerror = (e: any) => {
       setError(e)
@@ -29,11 +29,12 @@ function Login(props:AppProps) {
   const onMessage = (message: any) => {
     try {
       const parsed = JSON.parse(message.data)
-   
-      if (parsed.qrcode) {
-        setQrcode(parsed.qrcode)
+   console.log(message)
+      if (parsed.jwt) {
+        setQrcode(parsed.jwt)
       }
     } catch(e) {
+
     }
   }
 
@@ -41,6 +42,7 @@ function Login(props:AppProps) {
     <div className="App">
     <header className="App-header">
       <section>
+
       <QRCode 
             value={qrcode} 
             includeMargin={true}
