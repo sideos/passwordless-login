@@ -60,6 +60,7 @@ const setupRequest = (router, components) => {
         }
     }));
     router.get("/gettoken/:token", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log(components.redis);
         let ch = components.redis.getItem(req.params.token);
         res.status(200).json({ jwt: ch });
     }));
@@ -81,9 +82,11 @@ const setupRequest = (router, components) => {
                         'X-Token': process.env.ACCESS_TOKEN
                     } });
                 response.data.data.payload.verifiableCredential.forEach(element => {
+                    console.log("VAL:", element, "JWT:", decoded);
+                    // console.log("VAL:", element.credentialSubject)
                     vcs.push(element);
                 });
-                if (vcs[0].credentialSubject.id === process.env.DID_ISSUER && vcs[0].credentialSubject.email) {
+                if (vcs[0].issuer.id === process.env.DID_ISSUER && vcs[0].credentialSubject.email) {
                     components.ws.send(JSON.stringify({ error: 0, email: vcs[0].credentialSubject.email }));
                     res.status(200).json({ data: { error: 0, payload: vcs } });
                     return;

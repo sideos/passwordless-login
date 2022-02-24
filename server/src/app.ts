@@ -6,8 +6,9 @@ import { setItem, getItem } from './redis'
 import { setupRequest, createRequest} from './endpoints/login';
 import { setupOffer, createOffer } from './endpoints/registration';
 
-const app = express();
-const expressWs = require('express-ws')(app)
+const appBase = express();
+const expressWs = require('express-ws')(appBase)
+let { app } = expressWs
 app.use(express.json())
 
 const requestRouter = express.Router()
@@ -36,7 +37,7 @@ app.get('/', (req, res) => {
 })
 
 const s = http.createServer(app)
-//@ts-ignore
+
 app.ws('/api/login',async (ws, req) => {
     components.ws = ws
     try {
@@ -50,7 +51,7 @@ app.ws('/api/login',async (ws, req) => {
         console.log('WebSocket was closed')
     })
 })
-//@ts-ignore
+
 app.ws('/api/registration',async (ws, req) => {
     components.ws = ws
   

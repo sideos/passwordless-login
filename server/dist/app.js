@@ -19,8 +19,9 @@ const config_1 = require("./config");
 const redis_1 = require("./redis");
 const login_1 = require("./endpoints/login");
 const registration_1 = require("./endpoints/registration");
-const app = (0, express_1.default)();
-const expressWs = require('express-ws')(app);
+const appBase = (0, express_1.default)();
+const expressWs = require('express-ws')(appBase);
+let { app } = expressWs;
 app.use(express_1.default.json());
 const requestRouter = express_1.default.Router();
 app.use("/request", requestRouter);
@@ -40,7 +41,6 @@ app.get('/', (req, res) => {
     res.status(200).send('all in check!');
 });
 const s = http_1.default.createServer(app);
-//@ts-ignore
 app.ws('/api/login', (ws, req) => __awaiter(void 0, void 0, void 0, function* () {
     config_1.components.ws = ws;
     try {
@@ -54,14 +54,12 @@ app.ws('/api/login', (ws, req) => __awaiter(void 0, void 0, void 0, function* ()
         console.log('WebSocket was closed');
     });
 }));
-//@ts-ignore
 app.ws('/api/registration', (ws, req) => __awaiter(void 0, void 0, void 0, function* () {
     config_1.components.ws = ws;
     ws.on('close', () => {
         console.log('WebSocket was closed');
     });
     ws.on('message', (data) => {
-        console.log(data);
         let message = JSON.parse(data);
         if (message.action === "getoffer") {
             (0, registration_1.createOffer)(config_1.components, message.email).then(response => {

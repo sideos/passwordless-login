@@ -81,7 +81,7 @@ export const setupRequest = (router: Router, components: { ws: any; redis: any; 
             vcs.push(element)
         });
 
-        if(vcs[0].credentialSubject.id === process.env.DID_ISSUER && vcs[0].credentialSubject.email){
+        if(vcs[0].issuer.id=== process.env.DID_ISSUER && vcs[0].credentialSubject.email){
 
           components.ws.send(JSON.stringify({error:0, email:vcs[0].credentialSubject.email}))
           res.status(200).json({ data: {error: 0, payload: vcs}})

@@ -14,6 +14,13 @@ export default function loginReducer(state = initialState, action: AnyAction): L
           token: action.payload
         }
       }
+      case 'LOGOUT': {
+        localStorage.removeItem('token')
+        return {
+          ...state,
+          token: ''
+        }
+      }
       default:
         return state;
     }

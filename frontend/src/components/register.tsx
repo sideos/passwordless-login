@@ -3,7 +3,6 @@ import '../App.css';
 import { connect, ConnectedProps} from 'react-redux'
 import type { RootState } from '../store'
 import QRCode from 'qrcode.react'
-import axios from 'axios'
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 interface AppProps extends PropsFromRedux { }
@@ -34,6 +33,7 @@ function Dashboard(props:AppProps) {
   const onMessage = (message: any) => {
     try {
       const parsed = JSON.parse(message.data)
+
       if (parsed.jwt) {
         setResponse(parsed.jwt)
       }
