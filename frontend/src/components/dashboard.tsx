@@ -16,10 +16,10 @@ function Dashboard(props:AppProps) {
     <div className="App">
       <header className="App-header">
         <section>
-          <div onClick={() => props.logout()}>Logout</div>
+          <div className="emailbutton" onClick={() => props.logout()}>Logout</div>
         </section>
         <section>
-          <div> Dashboard { props.token?<p>hello {props.token}</p>:null }</div>
+          <div className="emaillabel">Welcome to the Dashboard { props.token?props.token:null }</div>
         </section>
       </header>
     </div>

@@ -1,8 +1,18 @@
 import axios, { AxiosResponse } from 'axios'
 import { v4 } from 'uuid'
-import { Router } from 'express-ws';
+import jwt_decode from "jwt-decode";
 
 const PROFILE_INFO = 26
+
+interface VC {
+    verifiableCredential:[
+        {
+            credentialSubject:{
+                email:string
+            }
+        }
+    ]
+}
 
 export const createOffer = async (components, email:string) => {
   try {
@@ -40,14 +50,24 @@ export const setupOffer = (router, components) => {
     let verification = components.redis.getItem(req.params.challenge)
     if (verification) {
         const response = await axios.post(process.env.SSI_SERVER_V2 + '/v2/consumeoffer', {
-                token: jwt
-                }, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Token': process.env.ACCESS_TOKEN
-                    }
-                })
-        res.status(200).json(response.data)
+            token: jwt
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Token': process.env.ACCESS_TOKEN
+                }
+            })
+        if (response.data.data.error===0) {
+            const decoded:VC = jwt_decode(response.data.data.jwt)
+            if (decoded.verifiableCredential[0].credentialSubject.email) {
+                components.ws.send(JSON.stringify({error:0, email:decoded.verifiableCredential[0].credentialSubject.email}))
+                res.status(200).json(response.data)
+            } else {
+                res.status(403).json({})
+            }
+        } else {
+            res.status(403).json({})
+        }
     } else {
         res.status(403).json({})
     }

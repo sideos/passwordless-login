@@ -1,13 +1,14 @@
 import { useEffect, useState} from 'react';
 import '../App.css';
 import { connect, ConnectedProps} from 'react-redux'
-import type { RootState } from '../store'
 import QRCode from 'qrcode.react'
+import type { RootState,AppDispatch } from '../store'
+
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 interface AppProps extends PropsFromRedux { }
 
-function Dashboard(props:AppProps) {
+function Register(props:AppProps) {
   const [qrcode, setQrcode] = useState('')
   const [error, setError] = useState('');
   const [email, setEmail] = useState('');
@@ -33,9 +34,13 @@ function Dashboard(props:AppProps) {
   const onMessage = (message: any) => {
     try {
       const parsed = JSON.parse(message.data)
-
+      console.log("RESPO:", parsed)
       if (parsed.jwt) {
         setResponse(parsed.jwt)
+      }
+      if (parsed.email) {
+        localStorage.setItem("token",parsed.email)
+        props.sendToken(parsed.email)
       }
     } catch(e) {
       console.log(e)
@@ -52,18 +57,22 @@ function Dashboard(props:AppProps) {
       <header className="App-header">
         <section>
           <div>
-            <input type="text" name="email" onChange={(e) => setEmail(e.target.value)} />
-            <div onClick={() => getOffer()} >Register</div>
+            <label className="emaillabel">Enter your email</label>
+            <input className="emailinput" type="text" name="email" onChange={(e) => setEmail(e.target.value)} />
+            <div className="emailbutton" onClick={() => getOffer()} >Register</div>
           </div>
           <div>
             {
             response ?
+            <div className="emaillabel">
+              <div>Scan the QRCode to receive a credential</div>
               <QRCode 
                 value={response} 
                 includeMargin={true}
                 size={250}
                 className="qrcode"
               />
+              </div>
               : null
             }
           </div>
@@ -75,10 +84,15 @@ function Dashboard(props:AppProps) {
 
 const mapStateToProps = (state:RootState) => {
   return {
-    token: state.login.token,
+    token: state.login.token
   };
 };
+function mapDispatchToProps(dispatch:AppDispatch) {
+  return {
+    sendToken: (item:string) => { dispatch({type:'STORE_TOKEN', payload: item}) },
+  }
+}
 
-const connector = connect(mapStateToProps)
+const connector = connect(mapStateToProps, mapDispatchToProps)
 
-export default connector(Dashboard);
+export default connector(Register);
