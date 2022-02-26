@@ -19,7 +19,7 @@ const offerRouter = express.Router()
 app.use("/offer", offerRouter);
 setupOffer(offerRouter, components)
 
-const PORT = 8084;
+const PORT = process.env.PASSWORDLESS_LOGIN_PORT || 8000
 
 app.use(
   cors({

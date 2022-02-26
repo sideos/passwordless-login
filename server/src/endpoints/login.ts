@@ -3,14 +3,13 @@ import { v4 } from 'uuid'
 import { Router } from 'express-ws';
 import jwt_decode from "jwt-decode";
 
-const PROFILE_INFO = 26
-
+const TEMPLATE_ID = process.env.TEMPLATE_ID || 26
 
 export const createRequest= async (components:{redis}) => {
   try {
   const response = await axios.post(process.env.SSI_SERVER_V2 + '/v2/createrequestvc', 
       {
-          templateid: PROFILE_INFO,
+          templateid: TEMPLATE_ID,
           dataset: { },
           domain: process.env.PASSWORDLESS_LOGIN_SERVER +"/request/consumerequest",
           challenge : "challenge"
@@ -34,7 +33,7 @@ export const setupRequest = (router: Router, components: { ws: any; redis: any; 
     try {
       const response = await axios.post(process.env.SSI_SERVER_V2 + '/v2/createrequestvc', 
           {
-              templateid: PROFILE_INFO,
+              templateid: TEMPLATE_ID,
               dataset: { },
               domain: process.env.PASSWORDLESS_LOGIN_SERVER +"/request/consumerequest",
               challenge : "challenge"
@@ -51,7 +50,7 @@ export const setupRequest = (router: Router, components: { ws: any; redis: any; 
       res.status(500).json({})
     }
   })
-  
+
 
   router.get("/gettoken/:token", async (req, res) => {
     console.log(components.redis)

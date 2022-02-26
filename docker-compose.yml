@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+
+  react-frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_SOCKET_URL
+        - REACT_APP_API_URL
+    ports:
+      - '80:80'
+
+  backend-server:
+    container_name: backend
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      args:
+        - PASSWORDLESS_LOGIN_SERVER
+        - SSI_SERVER_V2
+        - ACCESS_TOKEN
+        - PASSWORDLESS_LOGIN_PORT
+    ports:
+      - '8000:8000'
